@@ -1,6 +1,0 @@
-{
-    "python.defaultInterpreterPath": "c:/Users/gabri/nexus-ai/nexus_ai_server/venv/Scripts/python.exe",
-    "python.analysis.extraPaths": [
-        "."
-    ]
-}

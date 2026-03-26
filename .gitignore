@@ -5,3 +5,10 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# IDEs
+.vscode/
+.idea/
+
+# Docker/DB
+postgres_data/
