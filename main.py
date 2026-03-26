@@ -2,17 +2,35 @@ from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
+from contextlib import asynccontextmanager
+
+# Garante que o .env seja carregado antes que os imports das rotas/db tentem acessar
 from dotenv import load_dotenv
-
-from src.infrastructure.factories.llm_factory import LLMFactory
-from src.core.interfaces.llm_provider import LLMProvider
-from src.infrastructure.factories.system_factory import SystemFactory
-from src.services.ingestion_service import IngestionService
-
-# Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
 
-app = FastAPI(title="Nexus IA Backend (RAG Enabled)")
+from src.infrastructure.factories.system_factory import SystemFactory
+from src.services.ingestion_service import IngestionService
+from src.infrastructure.database.config import engine
+from src.infrastructure.database.models import Base
+
+from sqlalchemy import text
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Executa na hora que o Uvicorn / Servidor sobe (Testa DB e cria tabelas)
+    print("Iniciando FastAPI Lifespan. Configurando Banco de Dados...")
+    with engine.connect() as conn:
+        conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        conn.commit()
+    
+    # Isso lerá de models.py as tabelas (users, repositories, code_embeddings) e vai criá-las no PostgreSQL
+    Base.metadata.create_all(bind=engine)
+    print("Tabelas criadas/verificadas com sucesso no Schema Public!")
+    yield
+    # Limpeza caso o servidor feche
+    print("Servidor desligando...")
+
+app = FastAPI(title="Nexus IA Backend (RAG Enabled)", lifespan=lifespan)
 
 # Configuração do CORS
 # Permite que aplicações externas como o Flutter façam requisições ao servidor
