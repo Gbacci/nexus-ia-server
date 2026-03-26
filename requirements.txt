@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pydantic
+anthropic
+google-generativeai
+python-dotenv
+sqlalchemy
+pgvector
+psycopg2-binary
+gitpython
+PyGithub

@@ -1,0 +1,9 @@
+[tool.pyright]
+venvPath = "."
+venv = "venv"
+extraPaths = ["."]
+
+[tool.pylance]
+venvPath = "."
+venv = "venv"
+extraPaths = ["."]
